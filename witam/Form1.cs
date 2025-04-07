@@ -146,6 +146,12 @@ namespace witam
 
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Okno2 = new Form2();
+            this.Okno2.Show();
+        }
+
         private void butPlus_Click(object sender, EventArgs e)
         {
             var1 = Convert.ToDouble(textVar.Text);
