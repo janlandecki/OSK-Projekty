@@ -1,59 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Media;
 using System.Windows.Forms;
 
 namespace witam
 {
-    public partial class Form2 : Form { 
-    
-
-    public Form2()
+    public partial class Form2 : Form
     {
-        InitializeComponent();
-
-        // Upewnij się, że kropka jest niewidoczna na starcie
-        this.pictureBoxDot.Visible = false;
-        this.buttonClick.Enabled = false;
-
-    }
         private Stopwatch stopwatch = new Stopwatch();
+        private bool soundPlayed = false;
+        private bool stimulusActive = false;
 
-    private void TimerWait_Tick(object sender, EventArgs e)
-    {
-            this.timerWait.Stop();
-            this.pictureBoxDot.Visible = true;
+        // Dodane: historia wyników
+        private List<long> visualTestHistory = new List<long>();
+        private List<long> audioTestHistory = new List<long>();
+
+        public Form2()
+        {
+            InitializeComponent();
+
+            this.labelNow.Visible = false;
+
             this.buttonClick.Enabled = true;
-            this.stopwatch.Restart();
-    }
+            this.timerWait.Tick += TimerWait_Tick;
 
+            this.radioButtonVisual.Checked = true;
+        }
+
+        private void TimerWait_Tick(object sender, EventArgs e)
+        {
+            this.timerWait.Stop();
+            stimulusActive = true;
+
+            if (radioButtonVisual.Checked)
+            {
+                this.labelNow.Visible = true;
+            }
+            else if (radioButtonAudio.Checked)
+            {
+                PlayBeepSound();
+                soundPlayed = true;
+            }
+
+            this.stopwatch.Restart();
+        }
 
         private void buttonStart_Click(object sender, EventArgs e)
         {
-            this.pictureBoxDot.Visible = false;
-            this.buttonClick.Enabled = false;
+            this.labelNow.Visible = false;
+            soundPlayed = false;
+            stimulusActive = false;
 
             int delay = DateTime.Now.Millisecond % 5 * 1000 + 3000;
-
             this.timerWait.Interval = delay;
             this.timerWait.Start();
         }
 
         private void buttonClick_Click(object sender, EventArgs e)
         {
-            if (!pictureBoxDot.Visible)
+            if (!stimulusActive)
+            {
+                this.timerWait.Stop();
+                this.labelNow.Visible = false;
+                soundPlayed = false;
+                MessageBox.Show("Za szybko! Poczekaj na sygnał.", "Zbyt wczesna reakcja");
                 return;
+            }
 
             this.stopwatch.Stop();
-            this.buttonClick.Enabled = false;
+            this.labelNow.Visible = false;
+            soundPlayed = false;
+            stimulusActive = false;
 
-            MessageBox.Show($"Twój czas reakcji: {stopwatch.ElapsedMilliseconds} ms", "Wynik");
+            long reactionTime = stopwatch.ElapsedMilliseconds;
+
+            if (radioButtonVisual.Checked)
+                visualTestHistory.Add(reactionTime);
+            else if (radioButtonAudio.Checked)
+                audioTestHistory.Add(reactionTime);
+
+            MessageBox.Show($"Twój czas reakcji: {reactionTime} ms", "Wynik");
+        }
+
+        private void PlayBeepSound()
+        {
+            SystemSounds.Beep.Play();
+        }
+
+        // Dodane: metoda pokazująca historię wyników
+        private void ShowHistory()
+        {
+            string visualHistory = string.Join(", ", visualTestHistory, " ms");
+            string audioHistory = string.Join(", ", audioTestHistory, " ms");
+
+            MessageBox.Show(
+                $"Historia testów wzrokowych:\n{visualHistory}\n\nHistoria testów słuchowych:\n{audioHistory}",
+                "Historia wyników"
+            );
+        }
+
+        private void buttonShowHistory_Click(object sender, EventArgs e)
+        {
+            ShowHistory();
         }
     }
 }
