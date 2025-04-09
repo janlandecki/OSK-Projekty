@@ -19,7 +19,7 @@ namespace witam
             InitializeComponent();
 
             // Konfiguracja timera do zegarów
-            timer1.Interval = 1000; // 1 sekunda
+            timer1.Interval = 1000; 
             timer1.Tick += timer1_Tick;
             timer1.Start();
 
