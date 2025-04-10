@@ -91,8 +91,12 @@ namespace witam
         // Dodane: metoda pokazująca historię wyników
         private void ShowHistory()
         {
-            string visualHistory = string.Join(", ", visualTestHistory, " ms");
-            string audioHistory = string.Join(", ", audioTestHistory, " ms");
+            string visualHistory = string.Join(" ms, ", visualTestHistory);
+            string audioHistory = string.Join(" ms, ", audioTestHistory);
+            if (visualHistory != "")
+                visualHistory += " ms";
+            if (audioHistory != "")
+                audioHistory += " ms";
 
             MessageBox.Show(
                 $"Historia testów wzrokowych:\n{visualHistory}\n\nHistoria testów słuchowych:\n{audioHistory}",
