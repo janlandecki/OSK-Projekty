@@ -7,6 +7,7 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
         private Form2 Okno2;
+        private Form4 Okno4;
         /// <summary>
         /// Wyczyść wszystkie używane zasoby.
         /// </summary>
@@ -46,6 +47,7 @@
             this.buttonColor = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.button1 = new System.Windows.Forms.Button();
+            this.buttonProj4 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -223,11 +225,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // buttonProj4
+            // 
+            this.buttonProj4.Location = new System.Drawing.Point(574, 330);
+            this.buttonProj4.Name = "buttonProj4";
+            this.buttonProj4.Size = new System.Drawing.Size(75, 23);
+            this.buttonProj4.TabIndex = 20;
+            this.buttonProj4.Text = "Projekt 4";
+            this.buttonProj4.UseVisualStyleBackColor = true;
+            this.buttonProj4.Click += new System.EventHandler(this.buttonProj4_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(734, 622);
+            this.Controls.Add(this.buttonProj4);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.buttonColor);
             this.Controls.Add(this.radioButton2);
@@ -271,6 +284,7 @@
         private System.Windows.Forms.Button buttonColor;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonProj4;
     }
 }
 
