@@ -16,18 +16,7 @@ namespace witam
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
-            using (LoginForm loginForm = new LoginForm())
-            {
-                if (loginForm.ShowDialog() == DialogResult.OK)
-                {
-                    Application.Run(new ProductionForm());
-                }
-                else
-                {
-                    Application.Exit();
-                }
-            }
+            Application.Run(new MainForm());
         }
     }
 }
