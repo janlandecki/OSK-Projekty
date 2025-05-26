@@ -24,7 +24,7 @@ namespace witam
             get => (byte)(AX & 0x00FF);
             set => AX = (ushort)((AX & 0xFF00) | value);
         }
-        // analogicznie BH, BL, CH, CL, DH, DL
+        
         public byte BH { get => (byte)(BX >> 8); set => BX = (ushort)((BX & 0x00FF) | (value << 8)); }
         public byte BL { get => (byte)(BX & 0x00FF); set => BX = (ushort)((BX & 0xFF00) | value); }
         public byte CH { get => (byte)(CX >> 8); set => CX = (ushort)((CX & 0x00FF) | (value << 8)); }

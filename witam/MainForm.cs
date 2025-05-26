@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using System.IO;
+
 namespace witam
 {
     public partial class MainForm: Form
@@ -27,10 +29,12 @@ namespace witam
                 {
                     program = ProgramIO.Load(dlg.FileName);
                     cpu.LoadProgram(program);
+                    txtProgramEditor.Lines = File.ReadAllLines(dlg.FileName);
                     RefreshDisplay();
                 }
             }
         }
+
 
         private void btnSave_Click(object sender, EventArgs e)
         {
@@ -53,7 +57,10 @@ namespace witam
         private void btnStep_Click(object sender, EventArgs e)
         {
             if (!cpu.Step())
+            {
                 MessageBox.Show("Koniec programu");
+                cpu.Reset();
+            }
             RefreshDisplay();
         }
 
@@ -67,6 +74,30 @@ namespace witam
             lstProgram.Items.Clear();
             foreach (var instr in program) lstProgram.Items.Add(instr.ToString());
             lblIP.Text = $"IP = {cpu.InstructionPointer}";
+
+            if (cpu.InstructionPointer < lstProgram.Items.Count)
+            {
+                lstProgram.SelectedIndex = cpu.InstructionPointer;
+            }
+        }
+
+        private void btnLoadFromEditor_Click(object sender, EventArgs e)
+        {
+            var lines = txtProgramEditor.Lines;
+            program = ProgramIO.Parse(lines);
+            cpu.LoadProgram(program);
+            RefreshDisplay();
+        }
+
+        private void lblIP_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            cpu.Reset();
+            RefreshDisplay();
         }
     }
 }
