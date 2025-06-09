@@ -73,11 +73,11 @@ namespace witam
                 $"CH={cpu.CH:X2} CL={cpu.CL:X2}  DH={cpu.DH:X2} DL={cpu.DL:X2}\r\n";
             lstProgram.Items.Clear();
             foreach (var instr in program) lstProgram.Items.Add(instr.ToString());
-            lblIP.Text = $"IP = {cpu.InstructionPointer}";
+            lblIP.Text = $"IP = {cpu.IP}";
 
-            if (cpu.InstructionPointer < lstProgram.Items.Count)
+            if (cpu.IP < lstProgram.Items.Count)
             {
-                lstProgram.SelectedIndex = cpu.InstructionPointer;
+                lstProgram.SelectedIndex = cpu.IP;
             }
         }
 

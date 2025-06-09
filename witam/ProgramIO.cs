@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace witam
 {
@@ -11,30 +12,42 @@ namespace witam
     {
         public static List<Instruction> Load(string path)
         {
-            var lines = File.ReadAllLines(path);
+            var lines = System.IO.File.ReadAllLines(path);
             var list = new List<Instruction>();
-
-            foreach (var line in lines.Select((t, i) => (t, i)))
+            foreach (var (text, idx) in lines.Select((t, i) => (t, i + 1)))
             {
-                var parts = line.t.Split(new[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 3) continue;
+                var trimmed = text.Trim();
+                if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith(";"))
+                    continue; // komentarz lub pusta
 
-                var instr = new Instruction { LineNumber = line.i + 1 };
-
-                instr.OpCode = (OpCode)Enum.Parse(typeof(OpCode), parts[0], true);
-                instr.Destination = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[1], true);
-
-                if (ushort.TryParse(parts[2], out ushort imm))
+                var parts = trimmed.Split(new[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                Instruction instr = new Instruction { LineNumber = idx };
+                // INTxx
+                if (parts[0].StartsWith("INT", StringComparison.OrdinalIgnoreCase))
                 {
-                    instr.IsImmediate = true;
-                    instr.Immediate = imm;
+                    instr.OpCode = OpCode.INT;
+                    // np. "INT16" lub "INT16H"
+                    var numText = parts[0].Substring(3).TrimEnd('H');
+                    instr.InterruptNumber = byte.Parse(numText, NumberStyles.HexNumber);
                 }
                 else
                 {
-                    instr.IsImmediate = false;
-                    instr.Source = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[2], true);
+                    instr.OpCode = (OpCode)Enum.Parse(typeof(OpCode), parts[0], true);
+                    instr.Destination = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[1], true);
+                    // czy immediate?
+                    if (ushort.TryParse(parts[2], out ushort imm) ||
+                        (parts[2].EndsWith("H", StringComparison.OrdinalIgnoreCase)
+                         && ushort.TryParse(parts[2].TrimEnd('H'), NumberStyles.HexNumber, null, out imm)))
+                    {
+                        instr.IsImmediate = true;
+                        instr.Immediate = imm;
+                    }
+                    else
+                    {
+                        instr.IsImmediate = false;
+                        instr.Source = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[2], true);
+                    }
                 }
-
                 list.Add(instr);
             }
             return list;
