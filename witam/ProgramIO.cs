@@ -12,74 +12,115 @@ namespace witam
     {
         public static List<Instruction> Load(string path)
         {
-            var lines = System.IO.File.ReadAllLines(path);
+            var lines = File.ReadAllLines(path);
             var list = new List<Instruction>();
+
+            char[] hexSuffix = { 'H', 'h' };
+
             foreach (var (text, idx) in lines.Select((t, i) => (t, i + 1)))
             {
                 var trimmed = text.Trim();
                 if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith(";"))
-                    continue; // komentarz lub pusta
+                    continue;
 
                 var parts = trimmed.Split(new[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                Instruction instr = new Instruction { LineNumber = idx };
-                // INTxx
+                var instr = new Instruction { LineNumber = idx };
+
+ 
                 if (parts[0].StartsWith("INT", StringComparison.OrdinalIgnoreCase))
                 {
                     instr.OpCode = OpCode.INT;
-                    // np. "INT16" lub "INT16H"
-                    var numText = parts[0].Substring(3).TrimEnd('H');
-                    instr.InterruptNumber = byte.Parse(numText, NumberStyles.HexNumber);
+                    string numText;
+                    if (parts.Length >= 2)
+                        numText = parts[1].TrimEnd(hexSuffix);
+                    else
+                        numText = parts[0].Substring(3).TrimEnd(hexSuffix);
+                    instr.InterruptNumber = byte.Parse(numText, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+
+                    list.Add(instr);
+                    continue;
+                }
+
+                instr.OpCode = (OpCode)Enum.Parse(typeof(OpCode), parts[0], true);
+                instr.Destination = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[1], true);
+
+                ushort value;
+                string operand = parts[2];
+
+                if (operand.Length >= 2 && operand.StartsWith("'") && operand.EndsWith("'"))
+                {
+                    instr.IsImmediate = true;
+                    instr.Immediate = (byte)operand.Trim('\'')[0];
+                }
+
+                else if (ushort.TryParse(operand, out value) ||
+                         (operand.EndsWith("H", StringComparison.OrdinalIgnoreCase)
+                          && ushort.TryParse(operand.TrimEnd(hexSuffix),
+                                             NumberStyles.HexNumber,
+                                             CultureInfo.InvariantCulture,
+                                             out value)))
+                {
+                    instr.IsImmediate = true;
+                    instr.Immediate = value;
                 }
                 else
                 {
-                    instr.OpCode = (OpCode)Enum.Parse(typeof(OpCode), parts[0], true);
-                    instr.Destination = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[1], true);
-                    // czy immediate?
-                    if (ushort.TryParse(parts[2], out ushort imm) ||
-                        (parts[2].EndsWith("H", StringComparison.OrdinalIgnoreCase)
-                         && ushort.TryParse(parts[2].TrimEnd('H'), NumberStyles.HexNumber, null, out imm)))
-                    {
-                        instr.IsImmediate = true;
-                        instr.Immediate = imm;
-                    }
-                    else
-                    {
-                        instr.IsImmediate = false;
-                        instr.Source = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[2], true);
-                    }
+                    instr.IsImmediate = false;
+                    instr.Source = (RegisterRef)Enum.Parse(typeof(RegisterRef), operand, true);
                 }
+
                 list.Add(instr);
             }
+
             return list;
         }
 
         public static List<Instruction> Parse(string[] lines)
         {
             var list = new List<Instruction>();
+            char[] hexSuffix = { 'H', 'h' };
 
-            foreach (var line in lines.Select((t, i) => (t, i)))
+            foreach (var (text, idx) in lines.Select((t, i) => (t, i + 1)))
             {
-                var parts = line.t.Split(new[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 3) continue;
+                var trimmed = text.Trim();
+                if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith(";"))
+                    continue;
 
-                var instr = new Instruction { LineNumber = line.i + 1 };
+                var parts = trimmed.Split(new[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 3)
+                    continue;
 
+                var instr = new Instruction { LineNumber = idx };
                 instr.OpCode = (OpCode)Enum.Parse(typeof(OpCode), parts[0], true);
                 instr.Destination = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[1], true);
 
-                if (ushort.TryParse(parts[2], out ushort imm))
+                ushort value;
+                string operand = parts[2];
+
+                if (operand.Length >= 2 && operand.StartsWith("'") && operand.EndsWith("'"))
                 {
                     instr.IsImmediate = true;
-                    instr.Immediate = imm;
+                    instr.Immediate = (byte)operand.Trim('\'')[0];
+                }
+                else if (ushort.TryParse(operand, out value) ||
+                         (operand.EndsWith("H", StringComparison.OrdinalIgnoreCase)
+                          && ushort.TryParse(operand.TrimEnd(hexSuffix),
+                                             NumberStyles.HexNumber,
+                                             CultureInfo.InvariantCulture,
+                                             out value)))
+                {
+                    instr.IsImmediate = true;
+                    instr.Immediate = value;
                 }
                 else
                 {
                     instr.IsImmediate = false;
-                    instr.Source = (RegisterRef)Enum.Parse(typeof(RegisterRef), parts[2], true);
+                    instr.Source = (RegisterRef)Enum.Parse(typeof(RegisterRef), operand, true);
                 }
 
                 list.Add(instr);
             }
+
             return list;
         }
 

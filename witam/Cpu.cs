@@ -34,27 +34,10 @@ namespace witam
         private short[] STOS = new short[StackSize];
         private int SP = StackSize - 1;
 
-        // Wątki
-        private Thread demoThread;
-        private Thread docThread;
-
         // Program
         private List<Instruction> program = new List<Instruction>();
         public int IP { get; private set; } = 0;
 
-        public Cpu()
-        {
-            docThread = new Thread(Dydaktyczny);
-            docThread.IsBackground = true;
-            docThread.Start();
-        }
-
-        public void StartDemo()
-        {
-            demoThread = new Thread(Demonstracyjny);
-            demoThread.IsBackground = true;
-            demoThread.Start();
-        }
         public void LoadProgram(List<Instruction> prog)
         {
             program = prog;
@@ -163,78 +146,79 @@ namespace witam
             }
         }
 
-        // --- BIOS/DOS Interrupt Simulations ---
+        // Symulacje przerwań
 
         private void VideoTeletypeOutput()
         {
-            // AH=0Eh, AL=char
-            Console.Write((char)AL);
+            char c = (char)AL;
+            Console.WriteLine($"[INT10h] VideoTeletypeOutput – znak: '{c}'");
         }
 
         private void GetEquipmentList()
         {
-            // AH=00h, returns AX=equipment flags
             AX = 0x002F;
+            Console.WriteLine($"[INT11h] GetEquipmentList – equipment flags = 0x{AX:X4}");
         }
 
         private void GetMemorySize()
         {
-            // AH=00h, returns AX=KB of conventional memory
             AX = 640;
+            Console.WriteLine($"[INT12h] GetMemorySize – conventional memory = {AX} KB");
         }
 
         private void DiskReadSectors()
         {
-            // AH=02h, AL=sectors, CH=cylinder, CL=sector, DH=head, DL=drive
-            AH = 0x00; // success
+            AH = 0x00;
+            Console.WriteLine(
+                $"[INT13h] DiskReadSectors – sectors={AL}, cylinder={CH}, sector={CL}, head={DH}, drive={DL} -> AH(success)=0x{AH:X2}");
         }
 
         private void WaitMilliSeconds()
         {
-            // AH=86h, CX:DX = milliseconds
             int ms = (CX << 16) | DX;
+            Console.WriteLine($"[INT15h] WaitMilliSeconds – sleeping for {ms} ms");
             Thread.Sleep(ms);
+            Console.WriteLine($"[INT15h] WaitMilliSeconds – wake up");
         }
 
         private void ReadKeyboard()
         {
-            // AH=10h, returns AL=char, AH=scan code
             AL = (byte)'A'; AH = 0x1E;
+            Console.WriteLine($"[INT16h] ReadKeyboard – char='{(char)AL}', scan code=0x{AH:X2}");
         }
 
         private void PrinterPrintChar()
         {
-            // AH=00h, AL=char, DX=printer port
-            Console.WriteLine($"[Printer] Printed: {(char)AL}");
-            AH = 0x00; // success
+            Console.WriteLine($"[INT17h] PrinterPrintChar – port={DX}, char='{(char)AL}'");
+            AH = 0x00;
+            Console.WriteLine($"[INT17h] PrinterPrintChar – status AH(success)=0x{AH:X2}");
         }
 
         private void BootstrapLoader()
         {
-            // AH=00h, simulate boot
-            Console.WriteLine("[Bootstrap] Bootloader called.");
+            Console.WriteLine("[INT19h] BootstrapLoader – bootloader called");
         }
 
         private void GetRTCTime()
         {
-            // AH=02h, returns CH=hour, CL=min, DH=sec
             var now = DateTime.Now;
             CH = (byte)now.Hour;
             CL = (byte)now.Minute;
             DH = (byte)now.Second;
+            Console.WriteLine($"[INT1Ah] GetRTCTime – time = {CH:D2}:{CL:D2}:{DH:D2}");
         }
 
         private void SetRTCTime()
         {
-            // AH=03h, CH=hour, CL=min, DH=sec
-            // Simulate setting RTC (no-op)
+            Console.WriteLine($"[INT1Ah] SetRTCTime – simulated set to {CH:D2}:{CL:D2}:{DH:D2}");
         }
 
         private void DosDisplayString()
         {
-            // AH=09h, DS:DX = pointer to string (simulate)
-            Console.WriteLine("[DOS] Display string (simulated).");
+            Console.WriteLine("[INT21h] DosDisplayString – displaying string (simulated)");
         }
+
+
 
         private ushort GetRegister(RegisterRef r)
         {
@@ -276,7 +260,7 @@ namespace witam
             }
         }
 
-        private void Dydaktyczny()
+        public void Dydaktyczny()
         {
             Console.WriteLine("[Dydaktyczny] Opis funkcji przerwań:");
             Console.WriteLine("INT 10h (Video): AH=0Eh, AL=znak -> wypisuje znak na ekranie");
@@ -291,7 +275,7 @@ namespace witam
             Console.WriteLine("INT 21h (DOS): AH=09h -> wyświetla napis (symulacja)");
         }
 
-        private void Demonstracyjny()
+        public void Demonstracyjny()
         {
             Console.WriteLine("[Demonstracyjny] Uruchamiam demo przerwań...");
             LoadProgram(new List<Instruction> {

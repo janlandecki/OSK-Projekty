@@ -42,6 +42,10 @@ namespace witam
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.btnReset = new System.Windows.Forms.Button();
+            this.Log = new System.Windows.Forms.RichTextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.demoBtn = new System.Windows.Forms.Button();
+            this.infoBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnLoad
@@ -166,11 +170,53 @@ namespace witam
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
+            // Log
+            // 
+            this.Log.Location = new System.Drawing.Point(798, 95);
+            this.Log.Name = "Log";
+            this.Log.Size = new System.Drawing.Size(304, 269);
+            this.Log.TabIndex = 12;
+            this.Log.Text = "";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(927, 67);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(57, 16);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Console";
+            // 
+            // demoBtn
+            // 
+            this.demoBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.demoBtn.Location = new System.Drawing.Point(968, 388);
+            this.demoBtn.Name = "demoBtn";
+            this.demoBtn.Size = new System.Drawing.Size(117, 23);
+            this.demoBtn.TabIndex = 14;
+            this.demoBtn.Text = "Demonstration";
+            this.demoBtn.UseVisualStyleBackColor = true;
+            this.demoBtn.Click += new System.EventHandler(this.demoBtn_Click);
+            // 
+            // infoBtn
+            // 
+            this.infoBtn.Location = new System.Drawing.Point(838, 388);
+            this.infoBtn.Name = "infoBtn";
+            this.infoBtn.Size = new System.Drawing.Size(97, 23);
+            this.infoBtn.TabIndex = 15;
+            this.infoBtn.Text = "Information";
+            this.infoBtn.UseVisualStyleBackColor = true;
+            this.infoBtn.Click += new System.EventHandler(this.infoBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1147, 450);
+            this.Controls.Add(this.infoBtn);
+            this.Controls.Add(this.demoBtn);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.Log);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -206,5 +252,9 @@ namespace witam
         private Label label2;
         private Label label3;
         private Button btnReset;
+        private RichTextBox Log;
+        private Label label4;
+        private Button demoBtn;
+        private Button infoBtn;
     }
 }

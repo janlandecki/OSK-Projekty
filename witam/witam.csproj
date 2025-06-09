@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="program.asm" />
+    <Content Include="program6.asm" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

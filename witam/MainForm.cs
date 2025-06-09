@@ -19,6 +19,9 @@ namespace witam
         public MainForm()
         {
             InitializeComponent();
+
+            var writer = new TextBoxWriter(Log);
+            Console.SetOut(writer);
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -98,6 +101,32 @@ namespace witam
         {
             cpu.Reset();
             RefreshDisplay();
+        }
+
+        private void demoBtn_Click(object sender, EventArgs e)
+        {
+            cpu.Demonstracyjny();
+        }
+
+        private void infoBtn_Click(object sender, EventArgs e)
+        {
+            cpu.Dydaktyczny();
+        }
+    }
+
+    class TextBoxWriter : TextWriter
+    {
+        private RichTextBox _box;
+        public TextBoxWriter(RichTextBox box) { _box = box; }
+
+        public override Encoding Encoding => Encoding.UTF8;
+
+        public override void WriteLine(string value)
+        {
+            if (_box.InvokeRequired)
+                _box.Invoke(new Action(() => _box.AppendText(value + Environment.NewLine)));
+            else
+                _box.AppendText(value + Environment.NewLine);
         }
     }
 }

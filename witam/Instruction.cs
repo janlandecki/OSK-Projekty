@@ -30,9 +30,14 @@ namespace witam
         public override string ToString()
         {
             if (OpCode == OpCode.INT)
-                return $"{LineNumber:000}: INT{InterruptNumber:X2}h";
+            {
+                return $"{LineNumber:000}: INT{InterruptNumber:X2}h  " +
+                       $"AH={AH:X2} AL={AL:X2}  CX={CX:X4} DX={DX:X4}";
+            }
 
-            var src = IsImmediate ? Immediate.ToString(CultureInfo.InvariantCulture) : Source.ToString();
+            var src = IsImmediate
+                ? Immediate.ToString(CultureInfo.InvariantCulture)
+                : Source.ToString();
             return $"{LineNumber:000}: {OpCode} {Destination}, {src}";
         }
     }
